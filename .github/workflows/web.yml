@@ -5,6 +5,7 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30   # prevent infinite hang
 
     steps:
       - name: Checkout repo
@@ -15,11 +16,19 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install pygbag
-        run: pip install pygbag==0.8.6
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install pygame
+          pip install pygbag==0.8.6
 
-      - name: Build web
-        run: python -m pygbag main.py
+      - name: Build WEB ONLY (no Android)
+        run: |
+          python -m pygbag \
+            --no-apk \
+            --html \
+            --no-compile \
+            main.py
 
       - name: Upload web build
         uses: actions/upload-artifact@v4
